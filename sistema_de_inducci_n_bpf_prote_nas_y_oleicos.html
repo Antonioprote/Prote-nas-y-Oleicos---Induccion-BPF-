@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inducción BPF - Proteínas y Oleicos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas-Confetti para efectos visuales -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        corpBlue: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#0f172a',
+                            950: '#0a0f1d'
+                        },
+                        corpYellow: {
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-corporate {
+            background: linear-gradient(135deg, #0a0f1d 0%, #1e3a8a 50%, #1e40af 100%);
+        }
+        .gradient-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        }
+        /* Ocultar barra de búsqueda de tiempo del reproductor */
+        video::-webkit-media-controls-timeline {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans flex flex-col justify-between">
+
+    <!-- Encabezado / Header -->
+    <header class="gradient-corporate text-white shadow-xl sticky top-0 z-50 border-b-4 border-corpYellow-400">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-xl bg-corpYellow-400 flex items-center justify-center text-corpBlue-950 font-black text-2xl shadow-md border-2 border-white">
+                    <i class="fa-solid fa-droplet"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-extrabold tracking-wide text-white">Proteínas y Oleicos</h1>
+                    <p class="text-xs text-corpYellow-300 font-medium">Planta de Procesamiento de Aceites • Inducción BPF</p>
+                </div>
+            </div>
+            <div>
+                <button onclick="toggleAdminModal()" class="text-xs bg-corpBlue-900/90 hover:bg-corpBlue-800 text-corpYellow-300 font-bold px-3.5 py-2 rounded-xl border border-corpYellow-400/40 shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-corpYellow-400"></i>
+                    <span class="hidden sm:inline">Panel Admin</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Indicador de Pasos -->
+    <div class="max-w-4xl mx-auto px-4 pt-6 w-full">
+        <div class="flex justify-between items-center relative">
+            <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1.5 bg-slate-200 -z-10 rounded-full"></div>
+            <div id="line-progress" class="absolute left-0 top-1/2 transform -translate-y-1/2 w-0 h-1.5 bg-corpYellow-400 -z-10 transition-all duration-500 rounded-full"></div>
+
+            <!-- Paso 1 -->
+            <div id="step-badge-1" class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-corpBlue-800 text-corpYellow-300 font-bold border-2 border-corpYellow-400 flex items-center justify-center shadow-md transition-all">
+                    1
+                </div>
+                <span class="text-xs font-bold mt-1 text-corpBlue-900">Registro</span>
+            </div>
+
+            <!-- Paso 2 -->
+            <div id="step-badge-2" class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-slate-300 text-slate-600 font-bold flex items-center justify-center transition-all">
+                    2
+                </div>
+                <span class="text-xs font-semibold mt-1 text-slate-500">Video BPF</span>
+            </div>
+
+            <!-- Paso 3 -->
+            <div id="step-badge-3" class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-slate-300 text-slate-600 font-bold flex items-center justify-center transition-all">
+                    3
+                </div>
+                <span class="text-xs font-semibold mt-1 text-slate-500">Evaluación</span>
+            </div>
+
+            <!-- Paso 4 -->
+            <div id="step-badge-4" class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-slate-300 text-slate-600 font-bold flex items-center justify-center transition-all">
+                    4
+                </div>
+                <span class="text-xs font-semibold mt-1 text-slate-500">Pase Digital</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal de Vistas -->
+    <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- PASO 1: REGISTRO DE VISITANTE -->
+        <section id="view-step-1" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-200">
+            <div class="text-center mb-6">
+                <span class="bg-blue-50 text-corpBlue-800 border border-blue-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Acceso a Planta</span>
+                <h2 class="text-2xl font-black text-corpBlue-950 mt-2">Registro de Visitante</h2>
+                <p class="text-slate-500 text-sm mt-1">Complete sus datos para ingresar a las instalaciones de <strong>Proteínas y Oleicos</strong>.</p>
+            </div>
+
+            <form id="form-visitor" onsubmit="handleRegister(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-extrabold text-corpBlue-900 uppercase mb-1">Nombre Completo *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3 top-3 text-corpBlue-600"></i>
+                        <input type="text" id="v-name" required placeholder="Ej. Carlos Mendoza" class="w-full pl-10 pr-3 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-corpBlue-600 focus:border-corpBlue-600 focus:outline-none bg-slate-50">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold text-corpBlue-900 uppercase mb-1">DNI / Documento de Identidad *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-id-card absolute left-3 top-3 text-corpBlue-600"></i>
+                        <input type="text" id="v-doc" required placeholder="Ej. 87654321" class="w-full pl-10 pr-3 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-corpBlue-600 focus:border-corpBlue-600 focus:outline-none bg-slate-50">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold text-corpBlue-900 uppercase mb-1">Empresa / Proveedor *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-building absolute left-3 top-3 text-corpBlue-600"></i>
+                        <input type="text" id="v-company" required placeholder="Ej. Logística Oleica S.A." class="w-full pl-10 pr-3 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-corpBlue-600 focus:border-corpBlue-600 focus:outline-none bg-slate-50">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold text-corpBlue-900 uppercase mb-1">Correo Electrónico *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-3 top-3 text-corpBlue-600"></i>
+                        <input type="email" id="v-email" required placeholder="carlos@ejemplo.com" class="w-full pl-10 pr-3 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-corpBlue-600 focus:border-corpBlue-600 focus:outline-none bg-slate-50">
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-extrabold text-corpBlue-900 uppercase mb-1">Anfitrión / Persona a visitar en Planta *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user-tie absolute left-3 top-3 text-corpBlue-600"></i>
+                        <input type="text" id="v-host" required placeholder="Ej. Ing. Roberto Gómez (Jefe de Producción)" class="w-full pl-10 pr-3 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-corpBlue-600 focus:border-corpBlue-600 focus:outline-none bg-slate-50">
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 mt-4 flex justify-end">
+                    <button type="submit" class="w-full md:w-auto bg-corpBlue-800 hover:bg-corpBlue-900 text-corpYellow-300 font-bold px-8 py-3.5 rounded-xl shadow-lg border-b-4 border-corpYellow-400 transition flex items-center justify-center gap-2 text-sm">
+                        <span>Siguiente: Ver Video BPF Proteínas y Oleicos</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- PASO 2: REPRODUCCIÓN DE VIDEO CONTROLADO -->
+        <section id="view-step-2" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-200 hidden">
+            <div class="text-center mb-4">
+                <span class="inline-block bg-corpYellow-400 text-corpBlue-950 text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider mb-2 shadow-sm">Requisito Obligatorio</span>
+                <h2 class="text-2xl font-black text-corpBlue-950">Inducción BPF - Proteínas y Oleicos</h2>
+                <p class="text-slate-500 text-sm mt-1">Por norma de inocuidad alimentaria, debe observar el video completo sin adelantarlo.</p>
+            </div>
+
+            <!-- Selector/Cargador de Video personalizado -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-video text-corpBlue-700 text-base"></i>
+                    <span class="font-bold text-slate-700">Video de Inducción:</span>
+                    <span id="current-video-source" class="text-slate-500 italic">Video institucional predeterminado</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="custom-video-input" class="cursor-pointer bg-corpBlue-100 hover:bg-corpBlue-200 text-corpBlue-900 font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 border border-corpBlue-300">
+                        <i class="fa-solid fa-upload text-corpBlue-700"></i> Cargar MP4 Local
+                    </label>
+                    <input type="file" id="custom-video-input" accept="video/mp4,video/webm" class="hidden" onchange="loadCustomVideo(event)">
+                </div>
+            </div>
+
+            <!-- Reproductor -->
+            <div class="relative bg-slate-950 rounded-2xl overflow-hidden shadow-2xl aspect-video max-w-3xl mx-auto border-4 border-corpBlue-900">
+                <video id="induction-video" class="w-full h-full object-contain" controlsList="nodownload noplaybackrate" disablePictureInPicture>
+                    <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                    Su navegador no admite la reproducción de video HTML5.
+                </video>
+
+                <!-- Overlay de inicio -->
+                <div id="video-overlay" class="absolute inset-0 bg-corpBlue-950/90 backdrop-blur-sm flex flex-col items-center justify-center text-white p-6 transition-all">
+                    <div class="w-16 h-16 rounded-2xl bg-corpYellow-400 text-corpBlue-950 flex items-center justify-center text-3xl mb-3 shadow-lg">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="text-xl font-black mb-1 text-center text-white">Seguridad e Inocuidad en Proteínas y Oleicos</h3>
+                    <p class="text-xs text-slate-300 text-center max-w-md mb-5">Instrucciones obligatorias sobre Buenas Prácticas de Fabricación, higiene y EPP para ingreso a la planta.</p>
+                    <button onclick="playVideo()" class="bg-corpYellow-400 hover:bg-corpYellow-300 text-corpBlue-950 font-black px-7 py-3 rounded-xl text-sm shadow-xl transition flex items-center gap-2 border-2 border-white">
+                        <i class="fa-solid fa-play"></i> Reproducir Video Completo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estado de Reproducción y Candado -->
+            <div class="mt-4 max-w-3xl mx-auto">
+                <div class="flex justify-between items-center text-xs font-bold mb-1">
+                    <span id="video-status-text" class="text-corpBlue-800 flex items-center gap-1">
+                        <i class="fa-solid fa-lock text-corpYellow-600"></i> Esperando reproducción...
+                    </span>
+                    <span id="video-time-display" class="text-slate-500 font-mono">00:00 / 00:00</span>
+                </div>
+                <!-- Barra de Progreso Personalizada en Amarillo Corporativo -->
+                <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden border border-slate-300">
+                    <div id="video-progress-bar" class="bg-corpYellow-400 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-between items-center max-w-3xl mx-auto">
+                <button onclick="goToStep(1)" class="text-slate-500 hover:text-corpBlue-900 text-xs font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i> Editar Datos
+                </button>
+                <button id="btn-to-quiz" disabled onclick="startQuiz()" class="bg-slate-300 text-slate-500 font-bold px-6 py-3 rounded-xl cursor-not-allowed transition flex items-center gap-2">
+                    <span>Iniciar Cuestionario BPF</span>
+                    <i class="fa-solid fa-lock" id="btn-quiz-icon"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- PASO 3: CUESTIONARIO DIDÁCTICO DE BPF -->
+        <section id="view-step-3" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-200 hidden">
+            <div class="flex justify-between items-center border-b pb-4 mb-6">
+                <div>
+                    <h2 class="text-xl font-extrabold text-corpBlue-950">Evaluación BPF - Proteínas y Oleicos</h2>
+                    <p class="text-xs text-slate-500">Responda a las preguntas basadas en el video institucional.</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 block uppercase font-bold">Avance</span>
+                    <span id="quiz-counter" class="text-sm font-black text-corpBlue-700">Pregunta 1 de 5</span>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Pregunta -->
+            <div id="quiz-card" class="space-y-6">
+                <!-- Se Inyecta Dinámicamente mediante JS -->
+            </div>
+
+            <!-- Feedback Explicativo didáctico -->
+            <div id="quiz-feedback" class="mt-4 p-4 rounded-xl hidden border">
+                <div class="flex items-start gap-3">
+                    <div id="feedback-icon" class="text-2xl mt-0.5"></div>
+                    <div>
+                        <h4 id="feedback-title" class="font-bold text-sm"></h4>
+                        <p id="feedback-text" class="text-xs mt-1 leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Navegación del Quiz -->
+            <div class="mt-6 flex justify-end">
+                <button id="btn-next-question" disabled onclick="nextQuestion()" class="bg-slate-300 text-slate-500 font-bold px-6 py-2.5 rounded-xl transition flex items-center gap-2 cursor-not-allowed">
+                    <span>Siguiente Pregunta</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- PASO 4: RESULTADO Y PASE DIGITAL -->
+        <section id="view-step-4" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-200 hidden">
+            
+            <!-- Estado Aprobad/Reprobado -->
+            <div id="result-header" class="text-center mb-6">
+                <!-- Se inyecta dinámicamente -->
+            </div>
+
+            <!-- CARNET / CERTIFICADO VISUAL DE INDUCCIÓN -->
+            <div id="certificate-card" class="max-w-md mx-auto gradient-card text-white rounded-2xl p-6 shadow-2xl border-4 border-corpYellow-400 relative overflow-hidden">
+                <!-- Marca de agua de fondo -->
+                <div class="absolute -right-8 -bottom-8 opacity-10 text-9xl text-corpYellow-300 pointer-events-none">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <div class="flex justify-between items-start border-b border-corpYellow-400/40 pb-3 mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-corpYellow-400 text-corpBlue-950 font-black flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-droplet"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-sm uppercase tracking-wider text-corpYellow-300">Proteínas y Oleicos</h3>
+                            <p class="text-[10px] text-slate-300">Pase de Inducción BPF para Visitantes</p>
+                        </div>
+                    </div>
+                    <span id="cert-status-badge" class="bg-emerald-500 text-slate-950 font-extrabold text-[10px] px-2.5 py-1 rounded-full uppercase">APROBADO</span>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Visitante Autorizado</span>
+                        <p id="cert-name" class="font-black text-base text-white">Carlos Mendoza</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <span class="text-slate-400 block text-[10px] uppercase font-bold">DNI / Documento</span>
+                            <p id="cert-doc" class="font-semibold text-slate-200">87654321</p>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Empresa</span>
+                            <p id="cert-company" class="font-semibold text-slate-200">Logística Oleica</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Fecha de Registro</span>
+                            <p id="cert-date" class="font-semibold text-slate-200">2026-10-27 15:00</p>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Anfitrión en Planta</span>
+                            <p id="cert-host" class="font-semibold text-slate-200">Roberto Gómez</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-corpYellow-400/40 flex justify-between items-center">
+                        <div>
+                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Puntaje BPF</span>
+                            <span id="cert-score" class="text-corpYellow-300 font-black text-base">100%</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Código de Pase</span>
+                            <span id="cert-code" class="font-mono text-xs text-corpYellow-300 font-bold">PyO-9021</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones de Exportación y Envío -->
+            <div class="mt-8 max-w-md mx-auto space-y-3">
+                <button onclick="sendEmailReport()" class="w-full bg-corpBlue-900 hover:bg-corpBlue-950 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm border border-corpYellow-400/40">
+                    <i class="fa-solid fa-paper-plane text-corpYellow-400"></i>
+                    <span>Enviar Registro por Correo (Mailto)</span>
+                </button>
+
+                <button onclick="downloadExcel()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Descargar Historial Completo en Excel (.CSV)</span>
+                </button>
+
+                <button onclick="resetApp()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 px-4 rounded-xl transition text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Registrar Nuevo Visitante</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE ADMINISTRACIÓN / HISTORIAL -->
+    <div id="admin-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border-2 border-corpBlue-800">
+            <!-- Header Modal -->
+            <div class="gradient-corporate text-white p-4 flex justify-between items-center border-b-2 border-corpYellow-400">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-table text-corpYellow-400"></i>
+                    <h3 class="font-extrabold text-sm md:text-base">Proteínas y Oleicos • Control de Inducciones BPF</h3>
+                </div>
+                <button onclick="toggleAdminModal()" class="text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Contenido Modal -->
+            <div class="p-4 overflow-y-auto flex-grow">
+                <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
+                    <p class="text-xs text-slate-500">Historial de inducciones almacenado en recepción.</p>
+                    <div class="flex gap-2">
+                        <button onclick="downloadExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-file-excel"></i> Exportar a Excel
+                        </button>
+                        <button onclick="clearHistory()" class="bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1">
+                            <i class="fa-solid fa-trash"></i> Limpiar Registros
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-corpBlue-50 text-corpBlue-950 font-extrabold border-b border-slate-200">
+                                <th class="p-2.5">Código</th>
+                                <th class="p-2.5">Fecha</th>
+                                <th class="p-2.5">Visitante</th>
+                                <th class="p-2.5">DNI</th>
+                                <th class="p-2.5">Empresa</th>
+                                <th class="p-2.5">Anfitrión</th>
+                                <th class="p-2.5">Puntaje</th>
+                                <th class="p-2.5">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body" class="divide-y divide-slate-100 text-slate-600">
+                            <!-- Inyectado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="bg-slate-50 p-3 text-right border-t border-slate-200">
+                <button onclick="toggleAdminModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold px-4 py-2 rounded-xl">Cerrar Ventana</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer General -->
+    <footer class="bg-corpBlue-950 text-slate-400 text-center text-xs py-4 border-t-2 border-corpYellow-400">
+        <p>© 2026 Proteínas y Oleicos Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- LOGICA EN JAVASCRIPT -->
+    <script>
+        /* ==================== BANCO DE PREGUNTAS BPF ==================== */
+        const questionsData = [
+            {
+                id: 1,
+                question: "¿Cuál es el equipo de protección personal (EPI) mínimo obligatorio para ingresar a la planta de Proteínas y Oleicos?",
+                icon: "fa-hard-hat",
+                options: [
+                    { text: "Solo ropa casual de vestimenta propia y calzado deportivo.", correct: false },
+                    { text: "Cofia completa, barbijo (cubrebocas), botas de seguridad e indumentaria sin bolsillos externos.", correct: true },
+                    { text: "Lentes de seguridad únicamente.", correct: false },
+                    { text: "No se requiere equipo especial para visitas breves.", correct: false }
+                ],
+                explanation: "Las normas BPF de Proteínas y Oleicos exigen cofia completa para evitar caída de cabello, barbijo e indumentaria adecuada para garantizar la inocuidad."
+            },
+            {
+                id: 2,
+                question: "¿Cuál es la norma sobre el uso de joyas, relojes y objetos personales dentro del área productiva?",
+                icon: "fa-ring",
+                options: [
+                    { text: "Se permite si se cubren con guantes o cinta.", correct: false },
+                    { text: "Está permitido siempre que no se entre en contacto directo con las oleaginosas.", correct: false },
+                    { text: "Prohibición total de joyas, anillos, relojes, aretes o piercing visible.", correct: true },
+                    { text: "Solo se autoriza el uso de relojes inteligentes.", correct: false }
+                ],
+                explanation: "Las joyas representan un riesgo crítico de contaminación física por desprendimiento en las líneas de procesamiento de aceites."
+            },
+            {
+                id: 3,
+                question: "¿En qué momentos es obligatorio efectuar el lavado y desinfección de manos?",
+                icon: "fa-hands-bubbles",
+                options: [
+                    { text: "Antes de ingresar a proceso, tras usar los servicios higiénicos o tocar superficies ajenas.", correct: true },
+                    { text: "Solo una vez al comenzar el recorrido por la planta.", correct: false },
+                    { text: "Únicamente si las manos están visiblemente manchadas.", correct: false },
+                    { text: "No es requerido si se portan guantes de protección.", correct: false }
+                ],
+                explanation: "El lavado adecuado con agua y jabón desinfectante es fundamental para evitar la contaminación cruzada en áreas de proceso."
+            },
+            {
+                id: 4,
+                question: "¿Se permite consumir alimentos, beber líquidos o fumar dentro de las áreas de producción de la planta?",
+                icon: "fa-ban-smoking",
+                options: [
+                    { text: "Sí, únicamente agua embotellada en recipientes cerrados.", correct: false },
+                    { text: "Está totalmente prohibido. Solo se permite en áreas autorizadas como el comedor.", correct: true },
+                    { text: "Está permitido durante las explicaciones del guía de planta.", correct: false },
+                    { text: "Permitido solo en pasillos principales de la nave industrial.", correct: false }
+                ],
+                explanation: "Comer, beber o fumar en áreas productivas compromete la bioseguridad e induce riesgos de atracción de plagas."
+            },
+            {
+                id: 5,
+                question: "En caso de manifestar síntomas de enfermedad o malestar estomacal antes de la visita, ¿qué acción corresponde?",
+                icon: "fa-house-medical",
+                options: [
+                    { text: "Ingresar a planta procurando no tocar los equipos.", correct: false },
+                    { text: "Notificar de inmediato a su anfitrión en planta antes de ingresar a las naves de proceso.", correct: true },
+                    { text: "Tomar medicamentos e ingresar sin avisar.", correct: false },
+                    { text: "Usar doble barbijo sin notificar al personal de seguridad.", correct: false }
+                ],
+                explanation: "Cualquier síntoma infectocontagioso debe reportarse preventivamente para asegurar el cumplimiento estricto del plan de inocuidad."
+            }
+        ];
+
+        /* ==================== ESTADO GLOBAL ==================== */
+        let currentStep = 1;
+        let visitorData = {};
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let score = 0;
+        let videoWatched = false;
+
+        // Referencias DOM del video
+        const video = document.getElementById('induction-video');
+        const videoOverlay = document.getElementById('video-overlay');
+        const videoProgressBar = document.getElementById('video-progress-bar');
+        const videoStatusText = document.getElementById('video-status-text');
+        const videoTimeDisplay = document.getElementById('video-time-display');
+        const btnToQuiz = document.getElementById('btn-to-quiz');
+
+        /* ==================== CONTROL DE NAVEGACIÓN Y PASOS ==================== */
+        function goToStep(step) {
+            currentStep = step;
+            for(let i=1; i<=4; i++){
+                document.getElementById(`view-step-${i}`).classList.add('hidden');
+            }
+            document.getElementById(`view-step-${step}`).classList.remove('hidden');
+
+            const lineProgress = document.getElementById('line-progress');
+            lineProgress.style.width = `${((step - 1) / 3) * 100}%`;
+
+            for(let i=1; i<=4; i++) {
+                const badge = document.getElementById(`step-badge-${i}`).children[0];
+                if(i <= step) {
+                    badge.className = "w-10 h-10 rounded-full bg-corpBlue-800 text-corpYellow-300 font-bold border-2 border-corpYellow-400 flex items-center justify-center shadow-md transition-all";
+                } else {
+                    badge.className = "w-10 h-10 rounded-full bg-slate-300 text-slate-600 font-bold flex items-center justify-center transition-all";
+                }
+            }
+        }
+
+        /* ==================== PASO 1: REGISTRO ==================== */
+        function handleRegister(event) {
+            event.preventDefault();
+            visitorData = {
+                name: document.getElementById('v-name').value.trim(),
+                doc: document.getElementById('v-doc').value.trim(),
+                company: document.getElementById('v-company').value.trim(),
+                email: document.getElementById('v-email').value.trim(),
+                host: document.getElementById('v-host').value.trim(),
+                date: new Date().toLocaleString()
+            };
+            goToStep(2);
+        }
+
+        /* ==================== PASO 2: CONTROL DE VIDEO ==================== */
+        function playVideo() {
+            videoOverlay.classList.add('opacity-0', 'pointer-events-none');
+            video.play();
+        }
+
+        function loadCustomVideo(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const fileURL = URL.createObjectURL(file);
+                video.src = fileURL;
+                document.getElementById('current-video-source').textContent = `Archivo Local: ${file.name}`;
+                videoWatched = false;
+                btnToQuiz.disabled = true;
+                btnToQuiz.className = "bg-slate-300 text-slate-500 font-bold px-6 py-3 rounded-xl cursor-not-allowed transition flex items-center gap-2";
+                document.getElementById('btn-quiz-icon').className = "fa-solid fa-lock";
+                videoOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        let maxTimeWatched = 0;
+
+        video.addEventListener('timeupdate', () => {
+            const currentTime = video.currentTime;
+            const duration = video.duration || 1;
+
+            if (currentTime > maxTimeWatched + 2 && !videoWatched) {
+                video.currentTime = maxTimeWatched;
+            } else {
+                maxTimeWatched = Math.max(currentTime, maxTimeWatched);
+            }
+
+            const percent = (currentTime / duration) * 100;
+            videoProgressBar.style.width = `${percent}%`;
+
+            const curMins = Math.floor(currentTime / 60);
+            const curSecs = Math.floor(currentTime % 60);
+            const durMins = Math.floor(duration / 60) || 0;
+            const durSecs = Math.floor(duration % 60) || 0;
+            videoTimeDisplay.textContent = `${curMins < 10 ? '0':''}${curMins}:${curSecs < 10 ? '0':''}${curSecs} / ${durMins < 10 ? '0':''}${durMins}:${durSecs < 10 ? '0':''}${durSecs}`;
+
+            if(!videoWatched) {
+                videoStatusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-corpBlue-700"></i> Visualizando inducción obligatoria...`;
+            }
+        });
+
+        video.addEventListener('ended', () => {
+            videoWatched = true;
+            videoStatusText.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> ¡Video completado! Puede acceder a la evaluación.`;
+
+            btnToQuiz.disabled = false;
+            btnToQuiz.className = "bg-corpYellow-400 hover:bg-corpYellow-300 text-corpBlue-950 font-black px-6 py-3 rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer animate-pulse border-2 border-corpBlue-900";
+            document.getElementById('btn-quiz-icon').className = "fa-solid fa-arrow-right";
+        });
+
+        function startQuiz() {
+            if(!videoWatched) return;
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            score = 0;
+            goToStep(3);
+            renderQuestion();
+        }
+
+        /* ==================== PASO 3: CUESTIONARIO ==================== */
+        function renderQuestion() {
+            const q = questionsData[currentQuestionIndex];
+            document.getElementById('quiz-counter').textContent = `Pregunta ${currentQuestionIndex + 1} de ${questionsData.length}`;
+
+            const feedbackEl = document.getElementById('quiz-feedback');
+            feedbackEl.classList.add('hidden');
+
+            const btnNext = document.getElementById('btn-next-question');
+            btnNext.disabled = true;
+            btnNext.className = "bg-slate-300 text-slate-500 font-bold px-6 py-2.5 rounded-xl transition flex items-center gap-2 cursor-not-allowed";
+
+            const card = document.getElementById('quiz-card');
+            card.innerHTML = `
+                <div class="flex items-center gap-3 text-corpBlue-950">
+                    <div class="w-12 h-12 rounded-xl bg-corpBlue-100 text-corpBlue-800 flex items-center justify-center text-xl shrink-0 border border-corpBlue-200">
+                        <i class="fa-solid ${q.icon}"></i>
+                    </div>
+                    <h3 class="font-extrabold text-base md:text-lg">${q.question}</h3>
+                </div>
+
+                <div class="space-y-3 mt-4">
+                    ${q.options.map((opt, idx) => `
+                        <button onclick="selectOption(${idx})" id="opt-btn-${idx}" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-corpBlue-600 hover:bg-blue-50/50 transition flex items-start gap-3 group text-xs md:text-sm">
+                            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-corpBlue-800 group-hover:text-corpYellow-300">${String.fromCharCode(65 + idx)}</span>
+                            <span class="text-slate-800 font-medium">${opt.text}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function selectOption(selectedIndex) {
+            const q = questionsData[currentQuestionIndex];
+            const isCorrect = q.options[selectedIndex].correct;
+
+            q.options.forEach((_, idx) => {
+                const btn = document.getElementById(`opt-btn-${idx}`);
+                btn.disabled = true;
+                if(idx === selectedIndex) {
+                    if(isCorrect) {
+                        btn.className = "w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 flex items-start gap-3 text-xs md:text-sm";
+                    } else {
+                        btn.className = "w-full text-left p-4 rounded-xl border-2 border-rose-500 bg-rose-50 flex items-start gap-3 text-xs md:text-sm";
+                    }
+                } else if(q.options[idx].correct) {
+                    btn.className = "w-full text-left p-4 rounded-xl border-2 border-emerald-400 bg-emerald-50/50 flex items-start gap-3 text-xs md:text-sm opacity-80";
+                } else {
+                    btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 opacity-50 flex items-start gap-3 text-xs md:text-sm";
+                }
+            });
+
+            userAnswers.push({ questionId: q.id, selectedIndex, isCorrect });
+            if(isCorrect) score++;
+
+            const feedbackEl = document.getElementById('quiz-feedback');
+            const iconEl = document.getElementById('feedback-icon');
+            const titleEl = document.getElementById('feedback-title');
+            const textEl = document.getElementById('feedback-text');
+
+            feedbackEl.classList.remove('hidden');
+            if(isCorrect) {
+                feedbackEl.className = "mt-4 p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900";
+                iconEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i>`;
+                titleEl.textContent = "¡Respuesta Correcta!";
+            } else {
+                feedbackEl.className = "mt-4 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-900";
+                iconEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600"></i>`;
+                titleEl.textContent = "Respuesta Incorrecta";
+            }
+            textEl.textContent = q.explanation;
+
+            const btnNext = document.getElementById('btn-next-question');
+            btnNext.disabled = false;
+            btnNext.className = "bg-corpBlue-800 hover:bg-corpBlue-900 text-corpYellow-300 font-bold px-6 py-2.5 rounded-xl transition flex items-center gap-2 cursor-pointer shadow-md";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if(currentQuestionIndex < questionsData.length) {
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        /* ==================== PASO 4: RESULTADO Y PASE DIGITAL ==================== */
+        function finishQuiz() {
+            goToStep(4);
+            const percentage = Math.round((score / questionsData.length) * 100);
+            const passed = percentage >= 80;
+
+            const headerEl = document.getElementById('result-header');
+            const certStatusBadge = document.getElementById('cert-status-badge');
+
+            if(passed) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+
+                headerEl.innerHTML = `
+                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-3 border-2 border-emerald-300">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-corpBlue-950">¡Inducción Aprobada!</h2>
+                    <p class="text-slate-500 text-xs mt-1">Obtuvo una calificación de <strong class="text-emerald-600 font-extrabold">${percentage}%</strong>. Cumple los requerimientos BPF de Proteínas y Oleicos.</p>
+                `;
+                certStatusBadge.textContent = "AUTORIZADO";
+                certStatusBadge.className = "bg-corpYellow-400 text-corpBlue-950 font-black text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider border border-white";
+            } else {
+                headerEl.innerHTML = `
+                    <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-3 border-2 border-rose-300">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-corpBlue-950">Calificación Insuficiente</h2>
+                    <p class="text-slate-500 text-xs mt-1">Puntaje obtenido: <strong class="text-rose-600 font-extrabold">${percentage}%</strong>. Requiere al menos 80% para acceder a la planta.</p>
+                    <button onclick="startQuiz()" class="mt-3 bg-corpBlue-800 text-corpYellow-300 text-xs font-bold px-4 py-2 rounded-xl hover:bg-corpBlue-900 transition shadow">
+                        <i class="fa-solid fa-rotate-right"></i> Reintentar Evaluación BPF
+                    </button>
+                `;
+                certStatusBadge.textContent = "NO AUTORIZADO";
+                certStatusBadge.className = "bg-rose-600 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider";
+            }
+
+            const passCode = `PyO-${Math.floor(1000 + Math.random() * 9000)}`;
+
+            document.getElementById('cert-name').textContent = visitorData.name;
+            document.getElementById('cert-doc').textContent = visitorData.doc;
+            document.getElementById('cert-company').textContent = visitorData.company;
+            document.getElementById('cert-date').textContent = visitorData.date;
+            document.getElementById('cert-host').textContent = visitorData.host;
+            document.getElementById('cert-score').textContent = `${percentage}%`;
+            document.getElementById('cert-code').textContent = passCode;
+
+            saveRecord({
+                code: passCode,
+                ...visitorData,
+                score: `${percentage}%`,
+                passed: passed ? 'SI' : 'NO'
+            });
+        }
+
+        /* ==================== ALMACENAMIENTO Y EXPORTACIÓN ==================== */
+        function saveRecord(record) {
+            let history = JSON.parse(localStorage.getItem('pyo_bpf_history') || '[]');
+            history.push(record);
+            localStorage.setItem('pyo_bpf_history', JSON.stringify(history));
+            updateAdminTable();
+        }
+
+        function updateAdminTable() {
+            let history = JSON.parse(localStorage.getItem('pyo_bpf_history') || '[]');
+            const tbody = document.getElementById('admin-table-body');
+
+            if(history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">Sin visitas registradas en el sistema.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = history.map(item => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-2.5 font-mono text-corpBlue-800 font-black">${item.code}</td>
+                    <td class="p-2.5 whitespace-nowrap text-[11px]">${item.date}</td>
+                    <td class="p-2.5 font-bold text-slate-800">${item.name}</td>
+                    <td class="p-2.5">${item.doc}</td>
+                    <td class="p-2.5">${item.company}</td>
+                    <td class="p-2.5">${item.host}</td>
+                    <td class="p-2.5 font-black text-corpBlue-900">${item.score}</td>
+                    <td class="p-2.5">
+                        <span class="${item.passed === 'SI' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'} px-2 py-0.5 rounded-full font-black text-[10px]">
+                            ${item.passed === 'SI' ? 'Aprobado' : 'Reprobado'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function downloadExcel() {
+            let history = JSON.parse(localStorage.getItem('pyo_bpf_history') || '[]');
+            if(history.length === 0) {
+                alert("No hay registros almacenados para exportar.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "Codigo Pase,Fecha y Hora,Nombre Completo,DNI,Empresa,Correo,Anfitrion Planta,Puntaje,Aprobado\n";
+
+            history.forEach(row => {
+                csvContent += `"${row.code}","${row.date}","${row.name}","${row.doc}","${row.company}","${row.email || ''}","${row.host}","${row.score}","${row.passed}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Proteinas_y_Oleicos_Induccion_BPF_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function sendEmailReport() {
+            const passCode = document.getElementById('cert-code').textContent;
+            const percentage = document.getElementById('cert-score').textContent;
+
+            const subject = encodeURIComponent(`[Proteínas y Oleicos] Pase BPF - ${visitorData.name}`);
+            const body = encodeURIComponent(
+                `REGISTRO DE INDUCCIÓN BPF - PROTEÍNAS Y OLEICOS\n` +
+                `==================================================\n` +
+                `Código de Pase: ${passCode}\n` +
+                `Visitante: ${visitorData.name}\n` +
+                `DNI/ID: ${visitorData.doc}\n` +
+                `Empresa: ${visitorData.company}\n` +
+                `Correo: ${visitorData.email}\n` +
+                `Fecha/Hora: ${visitorData.date}\n` +
+                `Anfitrión a visitar: ${visitorData.host}\n` +
+                `Calificación Obtenida: ${percentage}\n` +
+                `Estado: ${percentage >= '80%' ? 'AUTORIZADO' : 'NO AUTORIZADO'}\n` +
+                `==================================================\n` +
+                `Notificación generada automáticamente por el Kiosco de Control de Accesos.`
+            );
+
+            window.location.href = `mailto:${visitorData.email || 'seguridad@proteinasyoleicos.com'}?subject=${subject}&body=${body}`;
+        }
+
+        function toggleAdminModal() {
+            const modal = document.getElementById('admin-modal');
+            modal.classList.toggle('hidden');
+            updateAdminTable();
+        }
+
+        function clearHistory() {
+            if(confirm("¿Desea eliminar el historial completo de visitantes registrado en esta terminal?")) {
+                localStorage.removeItem('pyo_bpf_history');
+                updateAdminTable();
+            }
+        }
+
+        function resetApp() {
+            document.getElementById('form-visitor').reset();
+            maxTimeWatched = 0;
+            videoWatched = false;
+            video.currentTime = 0;
+            btnToQuiz.disabled = true;
+            btnToQuiz.className = "bg-slate-300 text-slate-500 font-bold px-6 py-3 rounded-xl cursor-not-allowed transition flex items-center gap-2";
+            document.getElementById('btn-quiz-icon').className = "fa-solid fa-lock";
+            videoOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            goToStep(1);
+        }
+
+        window.onload = function() {
+            updateAdminTable();
+        };
+    </script>
+</body>
+</html>
