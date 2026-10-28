@@ -181,21 +181,6 @@
                 <p class="text-slate-500 text-sm mt-1">Por norma de inocuidad alimentaria, debe observar el video completo sin adelantarlo.</p>
             </div>
 
-            <!-- Selector/Cargador de Video personalizado -->
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-file-video text-corpBlue-700 text-base"></i>
-                    <span class="font-bold text-slate-700">Video de Inducción:</span>
-                    <span id="current-video-source" class="text-slate-500 italic">Video institucional predeterminado</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <label for="custom-video-input" class="cursor-pointer bg-corpBlue-100 hover:bg-corpBlue-200 text-corpBlue-900 font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 border border-corpBlue-300">
-                        <i class="fa-solid fa-upload text-corpBlue-700"></i> Cargar MP4 Local
-                    </label>
-                    <input type="file" id="custom-video-input" accept="video/mp4,video/webm" class="hidden" onchange="loadCustomVideo(event)">
-                </div>
-            </div>
-
             <!-- Reproductor -->
             <div class="relative bg-slate-950 rounded-2xl overflow-hidden shadow-2xl aspect-video max-w-3xl mx-auto border-4 border-corpBlue-900">
                 <video id="induction-video" class="w-full h-full object-contain" controlsList="nodownload noplaybackrate" disablePictureInPicture>
